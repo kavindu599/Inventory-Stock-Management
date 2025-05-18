@@ -1,0 +1,4 @@
+756f0020-7248-487e-a619-286a3441a025,Sample Laptop,Electronics,5,1200.0,2025-03-15,2027-05-15
+1e1c72fd-f916-497a-9542-92ac03ef5436,Office Chair,Furniture,8,150.0,2025-04-15,
+88feb676-f74d-46cd-81f5-d7fca08e6b9b,Printer Paper,Stationery,3,5.0,2025-05-05,
+d765e722-58dc-49cd-9370-5088ab25edfa,Expired Milk,Groceries,1,2.0,2025-05-05,2025-05-13
