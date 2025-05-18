@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/admin") // Base path for all admin API endpoints
+@RequestMapping("/api/admin")
 public class AdminController {
 
     private final AdminService adminService;
@@ -25,7 +25,7 @@ public class AdminController {
         this.reportFileService = reportFileService;
     }
 
-    // --- Dashboard Endpoints ---
+    // Dashboard Endpoints
     @GetMapping("/dashboard-stats")
     public ResponseEntity<DashboardStats> getDashboardStats() {
         return ResponseEntity.ok(adminService.getDashboardStats());
@@ -41,7 +41,7 @@ public class AdminController {
         return ResponseEntity.ok(adminService.getAdminLogs(limit));
     }
 
-    // --- Report Page Endpoints ---
+    // Report Page Endpoints 
     @GetMapping("/report-stats")
     public ResponseEntity<ReportStats> getReportStats() {
         return ResponseEntity.ok(adminService.getReportStats());
@@ -104,7 +104,7 @@ public class AdminController {
         return ResponseEntity.ok(reportFileService.listReportFiles());
     }
 
-    @GetMapping("/reports/view/{filename:.+}") // :.+ to allow dots in filename
+    @GetMapping("/reports/view/{filename:.+}")
     public ResponseEntity<String> viewReportContent(@PathVariable String filename) {
         String content = reportFileService.readReportContent(filename);
         return ResponseEntity.ok()
