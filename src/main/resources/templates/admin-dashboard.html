@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(~{::title}, ~{::section})}">
+<head>
+    <title>Admin Dashboard</title>
+</head>
+<body>
+<section>
+    <div class="page-header">
+        <h2>Admin Dashboard</h2>
+        <a th:href="@{/ui/stock/items/add}" class="btn btn-primary">Add New Item</a>
+    </div>
+
+    <!-- Placeholder for summary cards -->
+    <div class="summary-cards">
+        <div class="card"><h3>Total Items</h3><p th:text="${items.size()}">0</p></div>
+        <!-- Add more cards for Categories, Low Stock, Total Value later -->
+    </div>
+
+    <!-- Messages -->
+    <div th:if="${message}" class="message-success" th:text="${message}"></div>
+    <div th:if="${errorMessage}" class="message-error" th:text="${errorMessage}"></div>
+
+    <!-- Item Table -->
+    <div class="table-container">
+        <table>
+            <thead>
+            <tr>
+                <th>Item Code</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Quantity</th>
+                <th>Unit Price</th>
+                <th>Total Value</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(items)}">
+                <td colspan="7" style="text-align: center;">No items in stock.</td>
+            </tr>
+            <tr th:each="item : ${items}">
+                <td th:text="${item.itemCode}">IT001</td>
+                <td th:text="${item.name}">Laptop</td>
+                <td th:text="${item.category}">Electronics</td>
+                <td th:text="${item.quantity}">25</td>
+                <td th:text="${#numbers.formatCurrency(item.unitPrice)}">$999.99</td>
+                <td th:text="${#numbers.formatCurrency(item.getTotalValue())}">$24,999.75</td>
+                <td>
+                    <a th:href="@{/ui/stock/items/edit/{code}(code=${item.itemCode})}" class="btn btn-edit">Edit</a>
+                    <form th:action="@{/ui/stock/items/delete/{code}(code=${item.itemCode})}" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this item?');">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>
