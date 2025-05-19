@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Item</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+
+        }
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            margin-bottom: 15px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .error {
+            color: red;
+            margin-bottom: 15px;
+        }
+        .links {
+            margin-top: 15px;
+            text-align: center;
+        }
+        .form-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+    </style>
+</head>
+<body style="background-image: url('https://images.unsplash.com/photo-1685483749753-0dab7e144794?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');">
+
+
+<div id="errorMessage" class="error"></div>
+
+<form id="editItemForm" class="form-container">
+    <h1>Edit Item</h1>
+    <label for="editId">ID:</label>
+    <input type="text" id="editId" readonly>
+
+    <label for="editName">Name:</label>
+    <input type="text" id="editName" required>
+
+    <label for="editQuantity">Quantity:</label>
+    <input type="number" id="editQuantity" min="0" required>
+
+    <div id="expiryDateContainer" style="display:none;">
+        <label for="editExpiryDate">Expiry Date (YYYY-MM-DD):</label>
+        <input type="date" id="editExpiryDate">
+    </div>
+
+    <button type="submit">Update Item</button>
+
+    <div class="links">
+        <a href="itemlist.html">Back to Item List</a>
+    </div>
+</form>
+
+
+
+<script>
+    // Get the Spring Boot server URL
+    const API_BASE_URL = 'http://localhost:8080'; // Default Spring Boot port
+
+    // Show error message
+    function showError(message) {
+        const errorDiv = document.getElementById('errorMessage');
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+        setTimeout(() => {
+            errorDiv.style.display = 'none';
+        }, 5000); // Hide after 5 seconds
+    }
+
+    // Fetch the item details based on ID from URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const itemId = urlParams.get('id');
+
+    function loadItemDetails() {
+        fetch(`${API_BASE_URL}/api/items`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch items');
+                }
+                return response.json();
+            })
+            .then(items => {
+                const item = items.find(i => i.id === itemId);
+                if (item) {
+                    document.getElementById("editId").value = item.id;
+                    document.getElementById("editName").value = item.name;
+                    document.getElementById("editQuantity").value = item.quantity;
+
+                    // Show/hide expiry date based on item type
+                    const expiryContainer = document.getElementById('expiryDateContainer');
+                    if (item.expiryDate) {
+                        expiryContainer.style.display = 'block';
+                        document.getElementById("editExpiryDate").value = item.expiryDate;
+                    } else {
+                        expiryContainer.style.display = 'none';
+                    }
+                } else {
+                    showError("Item not found!");
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showError('Failed to load item details');
+            });
+    }
+
+    // Handle form submission to update item
+    document.getElementById("editItemForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const id = document.getElementById("editId").value;
+        const name = document.getElementById("editName").value;
+        const quantity = parseInt(document.getElementById("editQuantity").value);
+        const expiryDate = document.getElementById("editExpiryDate").value || '';
+
+        const formData = new URLSearchParams();
+        formData.append('id', id);
+        formData.append('quantity', quantity);
+        if (expiryDate) formData.append('expiryDate', expiryDate);
+
+        fetch(`${API_BASE_URL}/api/items/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: formData
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to update item');
+                }
+                return response.text();
+            })
+            .then(() => {
+                alert("Item updated successfully!");
+                window.location.href = "itemlist.html"; // Redirect back to the item list
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showError('Failed to update item. Please try again.');
+            });
+    });
+
+    // Load the item details on page load
+    loadItemDetails();
+</script>
+</body>
+</html>
