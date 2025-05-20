@@ -58,8 +58,8 @@ public class ReportFileService {
             return stream
                     .filter(Files::isRegularFile)
                     .map(path -> path.getFileName().toString())
-                    .filter(name -> name.endsWith(".txt")) // Ensure it's a text report
-                    .sorted(Collections.reverseOrder()) // Show newest first
+                    .filter(name -> name.endsWith(".txt"))
+                    .sorted(Collections.reverseOrder()) 
                     .collect(Collectors.toList());
         } catch (IOException e) {
             System.err.println("Error listing report files: " + e.getMessage());
