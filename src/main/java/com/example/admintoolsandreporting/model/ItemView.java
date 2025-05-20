@@ -12,8 +12,8 @@ public class ItemView {
     private String name;
     private String category;
     private int quantity;
-    private String status; // "In Stock", "Low Stock", "Out of Stock", "Expired"
-    private String expiryDate; // Formatted string
+    private String status; 
+    private String expiryDate;
 
     public static ItemView fromItem(Item item) {
         return new ItemView(
