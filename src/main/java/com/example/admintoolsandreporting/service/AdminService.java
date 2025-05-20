@@ -46,7 +46,6 @@ public class AdminService {
         }
     }
 
-    // --- Dashboard Methods ---
     public DashboardStats getDashboardStats() {
         List<Item> items = itemRepository.findAll();
         long totalProducts = items.size();
@@ -62,7 +61,7 @@ public class AdminService {
                 .collect(Collectors.toList());
     }
 
-    // --- Reporting Methods (Read Operations) ---
+    //Reporting Methods (Read Operations)
     public ReportStats getReportStats() {
         List<Item> items = itemRepository.findAll();
         long lowStock = items.stream().filter(item -> item.getQuantity() > 0 && item.getQuantity() < Constants.LOW_STOCK_THRESHOLD && !item.isExpired()).count();
@@ -143,8 +142,8 @@ public class AdminService {
         return fileName;
     }
 
-    // --- Delete Operation ---
-    public int deleteExpiredItemsViaReport() { // "via report" means acting on the category of items that *would* be in an expired report
+    // Delete Operation
+    public int deleteExpiredItemsViaReport() {
         List<Item> allItems = itemRepository.findAll();
         List<Item> itemsToKeep = allItems.stream()
                 .filter(item -> !item.isExpired())
@@ -160,10 +159,9 @@ public class AdminService {
         return deletedCount;
     }
 
-    // --- Logging ---
+    // Logging
     public void logAdminAction(String action) {
-        // In a real app, you'd get the Admin username from the security context
-        String adminUser = Constants.ADMIN_USERNAME; // Placeholder
+        String adminUser = Constants.ADMIN_USERNAME;
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         String logMessage = timestamp + " | User: " + adminUser + " | Action: " + action + "\n";
         try {
@@ -176,15 +174,15 @@ public class AdminService {
     public List<LogEntry> getAdminLogs(int limit) {
         try {
             List<String> allLines = Files.readAllLines(logFilePath, StandardCharsets.UTF_8);
-            Collections.reverse(allLines); // Newest first
+            Collections.reverse(allLines);
             return allLines.stream()
                     .limit(limit)
                     .map(line -> {
-                        String[] parts = line.split("\\|"); // Split by pipe
+                        String[] parts = line.split("\\|");
                         if (parts.length >= 3) {
                             return new LogEntry(parts[0].trim(), parts[2].replace("Action:", "").trim());
                         }
-                        return new LogEntry("N/A", line); // Fallback for malformed lines
+                        return new LogEntry("N/A", line);
                     })
                     .collect(Collectors.toList());
         } catch (IOException e) {
