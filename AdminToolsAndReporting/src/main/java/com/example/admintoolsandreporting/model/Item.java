@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.util.UUID;
 
-@Data // Lombok: getters, setters, toString, equals, hashCode
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Item {
@@ -32,7 +32,7 @@ public class Item {
         this.expiryDate = expiryDate;
     }
 
-    // OOP Encapsulated logic to determine item status
+    // Encapsulated logic to determine item status
     public String getStatus() {
         if (isExpired()) {
             return "Expired";
@@ -52,11 +52,11 @@ public class Item {
 
     public boolean isExpiringSoon() {
         return expiryDate != null &&
-                !isExpired() && // Not already expired
+                !isExpired() && 
                 expiryDate.isBefore(LocalDate.now().plusDays(Constants.EXPIRING_SOON_DAYS_THRESHOLD + 1));
     }
 
-    // For file storage
+    
     public String toFileString() {
         return String.join(",",
                 id,
@@ -71,7 +71,7 @@ public class Item {
 
     public static Item fromFileString(String line) {
         String[] parts = line.split(",");
-        if (parts.length < 7) return null; // Basic validation
+        if (parts.length < 7) return null;
         try {
             return new Item(
                     parts[0],
