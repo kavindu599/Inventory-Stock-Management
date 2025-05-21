@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/admin") // Base path for all admin API endpoints
+@RequestMapping("/api/admin")
 public class AdminController {
 
     private final AdminService adminService;
