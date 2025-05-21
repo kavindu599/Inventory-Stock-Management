@@ -4,7 +4,7 @@ package com.example.admintoolsandreporting.model;
 import com.example.admintoolsandreporting.util.Constants;
 import lombok.Data;
 
-// This class represents an Admin with potentially elevated permissions.
+
 @Data
 public class Admin {
     private String username;
