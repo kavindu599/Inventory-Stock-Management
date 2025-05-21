@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Item</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .confirmation {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        #confirmDelete {
+            background-color: #f44336;
+            color: white;
+            border: none;
+        }
+        #cancelDelete {
+            background-color: #e7e7e7;
+            color: black;
+            border: 1px solid #ddd;
+        }
+        .error {
+            color: red;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+<div class="confirmation">
+    <h1>Confirm Item Deletion</h1>
+
+    <div id="errorMessage" class="error"></div>
+
+    <p id="itemDetails"></p>
+
+    <div>
+        <button id="confirmDelete">Yes, Delete</button>
+        <button id="cancelDelete" onclick="window.location.href = 'itemlist.html';">Cancel</button>
+    </div>
+</div>
+
+<script>
+    // Get the Spring Boot server URL
+    const API_BASE_URL = 'http://localhost:8080'; // Default Spring Boot port
+
+    // Show error message
+    function showError(message) {
+        const errorDiv = document.getElementById('errorMessage');
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+        setTimeout(() => {
+            errorDiv.style.display = 'none';
+        }, 5000); // Hide after 5 seconds
+    }
+
+    // Get the item ID from the URL query string
+    const urlParams = new URLSearchParams(window.location.search);
+    const itemId = urlParams.get('id');
+
+    // Display item details for confirmation
+    function loadItemDetails() {
+        fetch(`${API_BASE_URL}/api/items`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch items');
+                }
+                return response.json();
+            })
+            .then(items => {
+                const item = items.find(i => i.id === itemId);
+                if (item) {
+                    document.getElementById("itemDetails").innerHTML = `
+                        <strong>ID:</strong> ${item.id}<br>
+                        <strong>Name:</strong> ${item.name}<br>
+                        <strong>Quantity:</strong> ${item.quantity}<br>
+                        ${item.expiryDate ? `<strong>Expiry Date:</strong> ${item.expiryDate}` : ''}
+                    `;
+                } else {
+                    showError("Item not found!");
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showError('Failed to load item details');
+            });
+    }
+
+    // Handle delete item confirmation
+    document.getElementById("confirmDelete").addEventListener("click", function () {
+        fetch(`${API_BASE_URL}/api/items/${itemId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to delete item');
+                }
+                return response.text();
+            })
+            .then(() => {
+                alert("Item deleted successfully!");
+                window.location.href = 'itemlist.html'; // Redirect back to the item list
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showError('Failed to delete item. Please try again.');
+            });
+    });
+
+    // Load the item details on page load
+    loadItemDetails();
+</script>
+</body>
+</html>

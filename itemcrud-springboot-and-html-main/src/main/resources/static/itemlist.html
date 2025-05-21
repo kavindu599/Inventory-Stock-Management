@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Item CRUD</title>
+    <style>
+        /* Reset and base styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            padding: 15px;
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #f4f4f4;
+        }
+
+        /* Responsive Table Styles */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            background-color: white;
+            box-shadow: 0 2px 3px rgba(0,0,0,0.1);
+            border-radius: 5px;
+        }
+
+        #itemTable {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        #itemTable th,
+        #itemTable td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        #itemTable th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #333;
+        }
+
+        #itemTable tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        #itemTable tr:hover {
+            background-color: #e9ecef;
+        }
+
+        /* Responsive Button Styles */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-buttons a,
+        .action-buttons button {
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .edit-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+        }
+
+        .edit-btn:hover {
+            background-color: #218838;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+
+        /* Error Message Styles */
+        .error {
+            color: #721c24;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        /* Add Item Link Styles */
+        .add-item-link {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .add-item-link:hover {
+            background-color: #0056b3;
+        }
+
+        /* Responsive Adjustments */
+        @media screen and (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            #itemTable th,
+            #itemTable td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body style="background-image: url('https://images.unsplash.com/photo-1560953981-28e3bab4aab6?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');">
+<h1>Item List</h1>
+
+<div id="errorMessage" class="error"></div>
+
+<div class="table-container">
+    <table id="itemTable">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Quantity</th>
+            <th>Expiry Date</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody id="itemTableBody">
+        <tr>
+            <td colspan="5">Loading items...</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<a href="addItem.html" class="add-item-link">Add New Item</a>
+
+<script>
+    // Get the Spring Boot server URL - change this to your actual server URL
+    const API_BASE_URL = 'http://localhost:8080'; // Default Spring Boot port
+
+    // Show error message
+    function showError(message) {
+        const errorDiv = document.getElementById('errorMessage');
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+        setTimeout(() => {
+            errorDiv.style.display = 'none';
+        }, 5000); // Hide after 5 seconds
+    }
+
+    // Function to fetch and display all items
+    function loadItems() {
+        const tableBody = document.getElementById('itemTableBody');
+        tableBody.innerHTML = '<tr><td colspan="5">Loading items...</td></tr>';
+
+        fetch(`${API_BASE_URL}/api/items`)
+            .then(response => {
+                console.log("Response status:", response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(items => {
+                console.log("Items loaded:", items);
+                tableBody.innerHTML = ''; // Clear loading message
+
+                if (items.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="5">No items found</td></tr>';
+                    return;
+                }
+
+                items.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.id || ''}</td>
+                        <td>${item.name || ''}</td>
+                        <td>${item.quantity || 0}</td>
+                        <td>${item.expiryDate || 'N/A'}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="editItem.html?id=${encodeURIComponent(item.id)}">
+                                    <button class="edit-btn">Edit</button>
+                                </a>
+                                <button class="delete-btn" onclick="deleteItem('${item.id}')">Delete</button>
+                            </div>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            })
+            .catch(error => {
+                console.error('Error loading items:', error);
+                tableBody.innerHTML = '<tr><td colspan="5">Failed to load items</td></tr>';
+                showError('Failed to load items. Please check that your server is running.');
+            });
+    }
+
+    // Function to handle item deletion
+    function deleteItem(id) {
+        if (!confirm(`Are you sure you want to delete item ${id}?`)) {
+            return;
+        }
+
+        fetch(`${API_BASE_URL}/api/items/${id}`, { method: 'DELETE' })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to delete item');
+                }
+                return response.text();
+            })
+            .then(() => {
+                loadItems(); // Reload the item list
+            })
+            .catch(error => {
+                console.error('Error deleting item:', error);
+                showError('Failed to delete item. Please try again.');
+            });
+    }
+
+    // Initial load of items
+    loadItems();
+</script>
+</body>
+</html>
