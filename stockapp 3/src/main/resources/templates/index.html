@@ -1,0 +1,555 @@
+<!-- ✅ START OF FILE -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Inventory Management</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+        :root {
+            --bg-gradient-start: #1a1a2e;
+            --bg-gradient-end: #16213e;
+            --accent-color: #0f3460;
+            --highlight: #e94560;
+            --highlight-glow: rgba(233, 69, 96, 0.5);
+            --success: #4ecca3;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --input-bg: rgba(255, 255, 255, 0.07);
+            --border-radius: 12px;
+            --glow: 0 0 15px rgba(233, 69, 96, 0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            min-height: 100vh;
+            color: var(--text-primary);
+            padding: 30px 20px;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .card {
+            width: 100%;
+            backdrop-filter: blur(16px);
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(233, 69, 96, 0.1) 0%, rgba(0, 0, 0, 0) 70%);
+            z-index: -1;
+        }
+
+        .glow-effect {
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.15;
+            z-index: -1;
+        }
+
+        .glow-1 {
+            top: -50px;
+            right: 10%;
+            background: var(--highlight);
+        }
+
+        .glow-2 {
+            bottom: 20%;
+            left: 5%;
+            background: var(--success);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px 35px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .card-body {
+            padding: 30px 35px;
+        }
+
+        h2 {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--text-primary), var(--highlight));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .header-icon {
+            margin-right: 12px;
+            font-size: 24px;
+            color: var(--highlight);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: transparent;
+            color: var(--text-primary);
+            border: none;
+            padding: 14px 20px;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--accent-color), var(--highlight));
+            box-shadow: 0 4px 20px rgba(233, 69, 96, 0.3);
+        }
+
+        .btn-primary:hover {
+            box-shadow: var(--glow);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .search-container {
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .search-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: flex-end;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 220px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .input-container {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--highlight);
+            font-size: 16px;
+        }
+
+        input[type="text"],
+        select {
+            width: 100%;
+            background-color: var(--input-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            padding: 14px 14px 14px 45px;
+            border-radius: var(--border-radius);
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--highlight);
+            box-shadow: 0 0 0 2px rgba(233, 69, 96, 0.25);
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23e94560' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 16px;
+            padding-right: 45px;
+        }
+
+        select option {
+            background-color: var(--accent-color);
+            color: var(--text-primary);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 5px;
+        }
+
+        .table-container {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 18px 20px;
+            text-align: left;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        td {
+            padding: 18px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        tbody tr {
+            transition: background-color 0.2s;
+        }
+
+        tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-weight: 500;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .status-urgent {
+            background: rgba(233, 69, 96, 0.15);
+            color: var(--highlight);
+            border: 1px solid rgba(233, 69, 96, 0.3);
+        }
+
+        .status-normal {
+            background: rgba(76, 204, 163, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(76, 204, 163, 0.3);
+        }
+
+        .action-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 8px 14px;
+            font-size: 13px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.2s;
+            font-weight: 500;
+            border: 1px solid;
+        }
+
+        .btn-edit {
+            background: rgba(76, 204, 163, 0.1);
+            color: var(--success);
+            border-color: rgba(76, 204, 163, 0.3);
+        }
+
+        .btn-edit:hover {
+            background: rgba(76, 204, 163, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 204, 163, 0.2);
+        }
+
+        .btn-delete {
+            background: rgba(233, 69, 96, 0.1);
+            color: var(--highlight);
+            border-color: rgba(233, 69, 96, 0.3);
+        }
+
+        .btn-delete:hover {
+            background: rgba(233, 69, 96, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(233, 69, 96, 0.2);
+        }
+
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 13px;
+            padding: 20px;
+            opacity: 0.7;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            color: var(--text-secondary);
+            opacity: 0.3;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state p {
+            color: var(--text-secondary);
+            opacity: 0.7;
+            max-width: 400px;
+            margin: 0 auto;
+            font-size: 15px;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(233, 69, 96, 0.3);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(233, 69, 96, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+                padding: 25px;
+            }
+
+            .card-body {
+                padding: 25px;
+            }
+
+            .btn-group {
+                width: 100%;
+            }
+
+            .form-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+
+            table {
+                min-width: 700px;
+            }
+
+            .action-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="glow-effect glow-1"></div>
+            <div class="glow-effect glow-2"></div>
+
+            <div class="card-header">
+                <h2><i class="header-icon fas fa-warehouse"></i>Inventory Management</h2>
+                <div class="btn-group">
+                    <a href="/add" class="btn btn-primary"><i class="fas fa-plus"></i> Add New Item</a>
+                    <a href="/sorted" class="btn btn-outline"><i class="fas fa-sort-amount-down"></i> Sort by Expiry</a>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="search-container">
+                    <form class="search-form" onsubmit="return false">
+                        <div class="form-group">
+                            <label>Search Items</label>
+                            <div class="input-container">
+                                <i class="input-icon fas fa-search"></i>
+                                <input type="text" id="searchInput" placeholder="Enter item name" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Filter By Status</label>
+                            <div class="input-container">
+                                <i class="input-icon fas fa-filter"></i>
+                                <select name="urgency">
+                                    <option value="">All Status Types</option>
+                                    <option value="urgent">Urgent</option>
+                                    <option value="normal">Normal</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <a href="/" class="btn btn-outline"><i class="fas fa-redo"></i> Reset</a>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Expiry Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="itemTableBody">
+                            <tr th:if="${items == null || items.empty}">
+                                <td colspan="5">
+                                    <div class="empty-state">
+                                        <i class="fas fa-box-open"></i>
+                                        <h3>No Items Found</h3>
+                                        <p>There are no items in your inventory yet. Add a new item to get started.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:each="item : ${items}" class="item-row">
+                                <td th:text="${item.id}"></td>
+                                <td th:text="${item.name}" class="item-name"></td>
+                                <td th:text="${item.expiryDate}"></td>
+                                <td>
+                                    <span class="status-badge" th:classappend="${item.urgent ? 'status-urgent' : 'status-normal'}"
+                                          th:text="${item.urgent ? 'URGENT' : 'NORMAL'}"></span>
+                                </td>
+                                <td>
+                                    <div class="action-group">
+                                        <a th:href="@{'/edit/' + ${item.id}}" class="action-btn btn-edit">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <a th:href="@{'/delete/' + ${item.id}}" onclick="return confirm('Are you sure you want to delete this item?')" class="action-btn btn-delete">
+                                            <i class="fas fa-trash-alt"></i> Delete
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>NEXUS INVENTORY • Next-Gen Stock Management © 2025</p>
+        </footer>
+    </div>
+
+    <script>
+        const searchInput = document.getElementById("searchInput");
+        const rows = document.querySelectorAll(".item-row");
+
+        searchInput.addEventListener("input", () => {
+            const query = searchInput.value.toLowerCase();
+            rows.forEach(row => {
+                const name = row.querySelector(".item-name").textContent.toLowerCase();
+                row.style.display = name.includes(query) ? "" : "none";
+            });
+        });
+    </script>
+</body>
+</html>
+<!-- ✅ END OF FILE -->
