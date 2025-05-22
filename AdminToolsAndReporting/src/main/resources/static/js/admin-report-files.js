@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const response = await fetch(`${API_BASE_URL}/reports/list`);
             if (!response.ok) throw new Error('Failed to load generated reports list');
             const reportFiles = await response.json();
-            generatedReportsList.innerHTML = ''; // Clear current list
+            generatedReportsList.innerHTML = '';
 
             if (reportFiles.length === 0) {
                 generatedReportsList.innerHTML = `<li class="text-gray-500 p-3 text-center">No reports generated yet.</li>`;
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 generatedReportsList.appendChild(listItem);
             });
 
-            // Add event listeners for new view buttons
+            
             document.querySelectorAll('.view-report-btn').forEach(button => {
                 button.addEventListener('click', async (event) => {
                     const fileName = event.currentTarget.dataset.filename;
@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function () {
             reportModal.classList.add('hidden');
         });
     }
-    // Close modal if clicked outside of it or on escape key
+    
     if(reportModal) {
         reportModal.addEventListener('click', (event) => {
             if (event.target === reportModal) {
@@ -111,6 +111,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Initial load
+    
     fetchGeneratedReportFiles();
 });
