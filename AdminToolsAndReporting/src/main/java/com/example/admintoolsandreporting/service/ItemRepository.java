@@ -14,12 +14,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Repository // Marks this as a Spring-managed repository
+@Repository
 public class ItemRepository {
 
     private final Path itemsFilePath;
 
-    // Inject path from application.properties
+    
     public ItemRepository(@Value("${data.items.path}") String itemsPathString) {
         this.itemsFilePath = Paths.get(itemsPathString);
         ensureFileExists();
@@ -32,7 +32,7 @@ public class ItemRepository {
             }
             if (!Files.exists(itemsFilePath)) {
                 Files.createFile(itemsFilePath);
-                // Optional: Add some sample data if file is new
+                
                 List<String> sampleData = List.of(
                         new Item("Sample Laptop", "Electronics", 5, 1200.00, java.time.LocalDate.now().minusMonths(2), java.time.LocalDate.now().plusYears(2)).toFileString(),
                         new Item("Office Chair", "Furniture", 8, 150.00, java.time.LocalDate.now().minusMonths(1), null).toFileString(), // null expiry
@@ -43,7 +43,7 @@ public class ItemRepository {
             }
         } catch (IOException e) {
             System.err.println("Error ensuring items file exists: " + e.getMessage());
-            // In a real app, might throw a custom unchecked exception
+            
         }
     }
 
@@ -70,5 +70,5 @@ public class ItemRepository {
         }
     }
 
-    // Add other CRUD methods if needed (findById, save, deleteById) for other components
+    
 }
