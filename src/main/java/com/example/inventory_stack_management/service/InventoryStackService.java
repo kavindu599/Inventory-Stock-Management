@@ -29,9 +29,9 @@ public class InventoryStackService { // Consider renaming to InventoryItemServic
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public InventoryStackService() {
-        // Configure ObjectMapper for pretty printing and to handle Java Time if you add it
+        
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-        // objectMapper.registerModule(new JavaTimeModule()); // If you use LocalDate etc.
+    
     }
 
     @PostConstruct
@@ -60,7 +60,7 @@ public class InventoryStackService { // Consider renaming to InventoryItemServic
         }
     }
 
-    // --- New CRUD Operations ---
+    // --- CRUD Operations ---
 
     public List<ItemDto> getAllItems() {
         return new ArrayList<>(inventoryItems); // Return a copy
@@ -81,7 +81,7 @@ public class InventoryStackService { // Consider renaming to InventoryItemServic
         }
         inventoryItems.add(newItem);
         logger.info("Added item: {}", newItem.getItemCode());
-        saveItemsToFile(); // Persist after modification
+        saveItemsToFile();
         return newItem;
     }
 
