@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(~{::title}, ~{::section})}">
+<head>
+    <title th:text="${pageTitle}">Item Form</title>
+</head>
+<body>
+<section>
+    <h2>Add New Item</h2>
+
+    <!-- Messages -->
+    <div th:if="${message}" class="message-success" th:text="${message}"></div>
+    <div th:if="${errorMessage}" class="message-error" th:text="${errorMessage}"></div>
+
+    <form th:action="${formAction}" th:object="${itemDto}" method="post" class="item-form-container">
+        <div>
+            <label for="itemCode">Item Code*:</label>
+            <!-- Make itemCode readonly if editing, or handle code changes carefully -->
+            <input type="text" id="itemCode" th:field="*{itemCode}" required
+                   th:readonly="${itemDto.itemCode != null && !itemDto.itemCode.isEmpty() && pageTitle == 'Edit Item'}"/>
+            <!-- <div th:if="${#fields.hasErrors('itemCode')}" th:errors="*{itemCode}" class="error-message"></div> -->
+        </div>
+        <div>
+            <label for="name">Item Name*:</label>
+            <input type="text" id="name" th:field="*{name}" required />
+            <!-- <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="error-message"></div> -->
+        </div>
+        <div>
+            <label for="quantity">Quantity*:</label>
+            <input type="number" id="quantity" th:field="*{quantity}" required min="0" />
+        </div>
+        <div>
+            <label for="unitPrice">Unit Price*:</label>
+            <input type="number" id="unitPrice" th:field="*{unitPrice}" required step="0.01" min="0" />
+        </div>
+        <div>
+            <label for="category">Category*:</label>
+            <select id="category" th:field="*{category}" required>
+                <option value="">Select a category</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Clothing">Clothing</option>
+                <option value="Books">Books</option>
+                <option value="Home Goods">Home Goods</option>
+                <!-- Add more categories or fetch from backend -->
+            </select>
+        </div>
+        <div>
+            <label for="description">Description:</label>
+            <textarea id="description" th:field="*{description}" rows="4"></textarea>
+        </div>
+        <div class="form-actions">
+            <button type="button" onclick="window.location.href='/ui/stock/dashboard'" class="btn btn-secondary">Cancel</button> <!-- Or clear form -->
+            <button type="submit" class="btn btn-primary" th:text="${pageTitle == 'Edit Item' ? 'Update Item' : 'Add Item'}">Add Item</button>
+        </div>
+    </form>
+</section>
+</body>
+</html>

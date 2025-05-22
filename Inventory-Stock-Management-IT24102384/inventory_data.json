@@ -1,0 +1,33 @@
+[ {
+  "itemCode" : "#05673",
+  "name" : "Hp Laptop",
+  "quantity" : 9,
+  "unitPrice" : 321,
+  "category" : "Electronics",
+  "description" : "new",
+  "totalValue" : 2889
+}, {
+  "itemCode" : "3456",
+  "name" : "Jacket",
+  "quantity" : 2,
+  "unitPrice" : 25,
+  "category" : "Clothing",
+  "description" : "new",
+  "totalValue" : 50
+}, {
+  "itemCode" : "#4563",
+  "name" : "Tab",
+  "quantity" : 7,
+  "unitPrice" : 100,
+  "category" : "Electronics",
+  "description" : "New arrival",
+  "totalValue" : 700
+}, {
+  "itemCode" : "1234",
+  "name" : "Headset",
+  "quantity" : 10,
+  "unitPrice" : 78,
+  "category" : "Electronics",
+  "description" : "New",
+  "totalValue" : 780
+} ]

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Inventory Stack Management</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}" />
+
+   <!-- <style>
+        body { font-family: sans-serif; margin: 20px; }
+        .stack-container { border: 1px solid #ccc; padding: 10px; margin-bottom: 20px; width: 300px; }
+        .stack-item { background-color: #f9f9f9; border: 1px solid #eee; padding: 8px; margin-bottom: 5px; }
+        .empty-stack { color: #888; }
+        .controls form { margin-bottom: 10px; }
+        .controls input[type="text"] { padding: 8px; margin-right: 5px; }
+        .controls button { padding: 8px 12px; }
+    </style>
+    -->
+</head>
+<body>
+
+<h1>Inventory Stack (LIFO)</h1>
+
+<!-- Section to Display the Stack -->
+<div class="stack-container">
+    <h2>Current Stack:</h2>
+    <div th:if="${#lists.isEmpty(stackItems)}">
+        <p class="empty-stack">(Stack is empty)</p>
+    </div>
+    <div th:unless="${#lists.isEmpty(stackItems)}">
+        <!-- Items will be listed here, top of stack first -->
+        <div th:each="item : ${stackItems}" class="stack-item">
+            <span th:text="${item.name}">Item Name</span>
+        </div>
+    </div>
+</div>
+
+<!-- Section for Controls (Push/Pop) -->
+<div class="controls">
+    <h2>Controls:</h2>
+
+    <!-- Form to Push an Item -->
+    <form th:action="@{/ui/inventory/push}" method="post">
+        <input type="text" name="itemName" placeholder="Enter item name" required/>
+        <button type="submit">Push Item</button>
+    </form>
+
+    <!-- Form to Pop an Item -->
+    <!-- We only show this form if the stack is not empty -->
+    <form th:action="@{/ui/inventory/pop}" method="post" th:if="${not #lists.isEmpty(stackItems)}">
+        <button type="submit">Pop Item (Uses <span th:text="${stackItems[0].name}">Top Item</span>)</button>
+    </form>
+</div>
+
+<!-- Display messages from the controller (e.g., success/error) -->
+<div th:if="${message}" style="margin-top: 20px; padding: 10px; border: 1px solid green;"
+     th:text="${message}">
+    Placeholder for messages
+</div>
+<div th:if="${errorMessage}" style="margin-top: 20px; padding: 10px; border: 1px solid red;"
+     th:text="${errorMessage}">
+    Placeholder for error messages
+</div>
+
+</body>
+</html>

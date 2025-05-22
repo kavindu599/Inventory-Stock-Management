@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(~{::title}, ~{::section})}">
+<head>
+    <meta charset="UTF-8"> <!-- It's good practice to have charset here too -->
+    <title>View All Items</title>
+</head>
+<body>
+<section>
+    <div class="page-header">
+        <h2>Item Details (Card View)</h2>
+        <!-- You can add a search or filter bar here later if needed -->
+    </div>
+
+    <div th:if="${message}" class="message-success" th:text="${message}"></div>
+    <div th:if="${errorMessage}" class="message-error" th:text="${errorMessage}"></div>
+
+    <div th:if="${#lists.isEmpty(items)}">
+        <p>No items currently in stock to display.</p>
+    </div>
+
+    <!-- This is where you will implement the card layout from image 4 -->
+    <!-- For now, a simple list to show it's working: -->
+    <div class="item-cards-container" th:unless="${#lists.isEmpty(items)}">
+        <div class="item-card" th:each="item : ${items}">
+            <div class="item-card-header">
+                <h3 th:text="${item.name}">Item Name</h3>
+                <!-- You can add stock status indicators here like "In Stock", "Medium Stock" -->
+                <span class="item-stock-status"
+                      th:classappend="${item.quantity == null || item.quantity <= 0 ? 'status-out-of-stock' : (item.quantity < 10 ? 'status-low-stock' : 'status-in-stock')}"
+                      th:text="${item.quantity == null || item.quantity <= 0 ? 'Out of Stock' : (item.quantity < 10 ? 'Low Stock' : 'In Stock')}">
+                    In Stock
+                </span>
+            </div>
+            <p class="item-category" th:text="${item.category}">Electronics</p>
+            <p class="item-description" th:text="${item.description}">Description goes here...</p>
+            <div class="item-details-grid">
+                <div>Unit Price:</div> <div th:text="${#numbers.formatCurrency(item.unitPrice)}">$0.00</div>
+                <div>Quantity:</div> <div th:text="${item.quantity} + ' units'">0 units</div>
+                <div>Total Value:</div> <div th:text="${#numbers.formatCurrency(item.getTotalValue())}">$0.00</div>
+            </div>
+        </div>
+    </div>
+
+</section>
+</body>
+</html>
