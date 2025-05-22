@@ -5,8 +5,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const actionMessageEl = document.getElementById('actionMessageFiles');
     const logsLinkSidebarFiles = document.getElementById('logsLinkSidebarFiles');
 
-
-    
     const reportModal = document.getElementById('reportModal');
     const closeModalButton = document.getElementById('closeModalButton');
     const modalReportTitle = document.getElementById('modalReportTitle');
