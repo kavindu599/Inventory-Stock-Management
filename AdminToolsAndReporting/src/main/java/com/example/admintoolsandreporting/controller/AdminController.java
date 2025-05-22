@@ -25,7 +25,7 @@ public class AdminController {
         this.reportFileService = reportFileService;
     }
 
-    // Dashboard Endpoints
+    
     @GetMapping("/dashboard-stats")
     public ResponseEntity<DashboardStats> getDashboardStats() {
         return ResponseEntity.ok(adminService.getDashboardStats());
@@ -41,7 +41,7 @@ public class AdminController {
         return ResponseEntity.ok(adminService.getAdminLogs(limit));
     }
 
-    // --- Report Page Endpoints ---
+    
     @GetMapping("/report-stats")
     public ResponseEntity<ReportStats> getReportStats() {
         return ResponseEntity.ok(adminService.getReportStats());
