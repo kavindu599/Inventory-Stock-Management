@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const logsLinkSidebarFiles = document.getElementById('logsLinkSidebarFiles');
 
 
-    // Modal elements
+    
     const reportModal = document.getElementById('reportModal');
     const closeModalButton = document.getElementById('closeModalButton');
     const modalReportTitle = document.getElementById('modalReportTitle');
