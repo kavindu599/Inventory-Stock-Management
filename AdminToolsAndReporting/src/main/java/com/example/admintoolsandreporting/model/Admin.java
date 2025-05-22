@@ -16,7 +16,7 @@ public class Admin {
     }
 
     public boolean hasElevatedPermissions() {
-        // Simple check for demonstration
+        
         return Constants.ADMIN_USERNAME.equals(this.username);
     }
 }
