@@ -1,19 +1,19 @@
 document.addEventListener('DOMContentLoaded', function () {
     const API_BASE_URL = '/api/admin';
 
-    // Stats elements
+    
     const reportLowStockEl = document.getElementById('reportLowStock');
     const reportExpiringSoonEl = document.getElementById('reportExpiringSoon');
     const reportExpiredEl = document.getElementById('reportExpired');
 
-    // Action buttons
+    
     const generateLowStockReportBtn = document.getElementById('generateLowStockReportBtn');
     const generateExpiringSoonReportBtn = document.getElementById('generateExpiringSoonReportBtn');
     const deleteExpiredBtn = document.getElementById('deleteExpiredBtn');
     const actionMessageEl = document.getElementById('actionMessage');
     const logsLinkSidebar = document.getElementById('logsLinkSidebar');
 
-    // Tab elements
+    
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
     const lowStockTableBody = document.getElementById('lowStockTableBody');
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const result = await response.json();
             if (!response.ok) throw new Error(result.message || `HTTP error! status: ${response.status}`);
             showActionMessage(successMessage + (result.fileName ? ` File: ${result.fileName}` : ''));
-            // No need to refresh generated file list here, it's on another page
+            
         } catch (error) {
             console.error('Error generating report file:', error);
             showActionMessage(error.message || 'Error generating report file.', true);
@@ -83,8 +83,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const result = await response.json();
             if (!response.ok) throw new Error(result.message || `HTTP error! status: ${response.status}`);
             showActionMessage(result.message || `Deleted ${result.deletedCount} expired items.`);
-            fetchReportStats(); // Refresh stats cards
-            // Refresh active live data table
+            fetchReportStats(); 
+            
             const activeTab = document.querySelector('.tab-button.border-blue-500');
             if (activeTab) {
                 if (activeTab.id === 'tabLowStock') fetchLowStockData();
@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Tab Switching Logic
+    
     tabButtons.forEach(button => {
         button.addEventListener('click', () => {
             tabButtons.forEach(btn => {
@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', function () {
             button.classList.add('border-blue-500', 'text-blue-600');
             button.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
 
-            const targetContentId = button.id.replace('tab', '').toLowerCase() + 'Content'; // e.g. lowstockContent
+            const targetContentId = button.id.replace('tab', '').toLowerCase() + 'Content'; 
             tabContents.forEach(content => {
                 if (content.id === targetContentId) {
                     content.classList.remove('hidden');
@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Initial data load for the page and the first tab
+    
     fetchReportStats();
-    fetchLowStockData(); // Load data for the default visible tab
+    fetchLowStockData();
 });
