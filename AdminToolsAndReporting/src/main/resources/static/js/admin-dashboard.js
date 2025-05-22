@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const items = await response.json();
 
-            currentStockTableBody.innerHTML = ''; // Clear existing rows
+            currentStockTableBody.innerHTML = ''; 
             if (items.length === 0) {
                 currentStockTableBody.innerHTML = `<tr><td colspan="4" class="text-center py-4">No stock data available.</td></tr>`;
                 return;
@@ -58,11 +58,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     async function fetchRecentActivity() {
         try {
-            const response = await fetch(`${API_BASE_URL}/logs?limit=5`); // Get latest 5 logs
+            const response = await fetch(`${API_BASE_URL}/logs?limit=5`);
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const logs = await response.json();
 
-            recentActivityList.innerHTML = ''; // Clear existing
+            recentActivityList.innerHTML = '';
             if (logs.length === 0) {
                 recentActivityList.innerHTML = `<li class="text-gray-500">No recent activity.</li>`;
                 return;
@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (logsLink) {
         logsLink.addEventListener('click', (e) => {
             e.preventDefault();
-            // For simplicity, just opening the logs page. A modal would be more advanced.
+            
             window.open('/api/admin/logs?limit=100', '_blank');
         });
     }
@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Initial data load
+    
     fetchDashboardStats();
     fetchCurrentStock();
     fetchRecentActivity();
