@@ -32,7 +32,7 @@ public class Item {
         this.expiryDate = expiryDate;
     }
 
-    // Encapsulated logic to determine item status
+    // Encapsulated logic
     public String getStatus() {
         if (isExpired()) {
             return "Expired";
