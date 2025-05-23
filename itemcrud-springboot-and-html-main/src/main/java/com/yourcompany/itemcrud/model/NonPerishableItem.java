@@ -11,7 +11,6 @@ public class NonPerishableItem extends Item {
         return String.format("ID: %s, Name: %s, Quantity: %d", id, name, quantity);
     }
 
-    // This is needed for Jackson serialization
     public String getExpiryDate() {
         return null;
     }
