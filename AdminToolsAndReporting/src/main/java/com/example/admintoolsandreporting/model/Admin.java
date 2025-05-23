@@ -4,7 +4,6 @@ package com.example.admintoolsandreporting.model;
 import com.example.admintoolsandreporting.util.Constants;
 import lombok.Data;
 
-
 @Data
 public class Admin {
     private String username;
