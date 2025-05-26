@@ -9,7 +9,7 @@ import java.util.*;
 public class FileBackedStringStack {
     private static final Logger logger = LoggerFactory.getLogger(FileBackedStringStack.class);
     private final String filePath;
-    private final Deque<String> stack; // Internal data structure (ArrayDeque is a good choice)
+    private final Deque<String> stack;
 
     public FileBackedStringStack(String filePath) {
         this.filePath = filePath;
