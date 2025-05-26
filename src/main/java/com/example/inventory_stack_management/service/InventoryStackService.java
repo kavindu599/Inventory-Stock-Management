@@ -1,9 +1,10 @@
 package com.example.inventory_stack_management.service;
 
 import com.example.inventory_stack_management.dto.ItemDto;
-import com.fasterxml.jackson.core.type.TypeReference; // For Jackson
-import com.fasterxml.jackson.databind.ObjectMapper;     // For Jackson
-import com.fasterxml.jackson.databind.SerializationFeature; // For pretty printing JSON
+import com.example.inventory_stack_management.util.FileBackedStringStack; // Import the new stack class
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -15,55 +16,73 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CopyOnWriteArrayList; // For thread-safety if needed, or synchronize methods
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Service
-public class InventoryStackService { // Consider renaming to InventoryItemService later
+public class InventoryStackService {
 
     private static final Logger logger = LoggerFactory.getLogger(InventoryStackService.class);
-    // Change file name and format
-    private static final String DATA_FILE_PATH = "inventory_data.json";
+    private static final String ITEMS_DATA_FILE_PATH = "inventory_data.json";
+    private static final String STACK_DATA_FILE_PATH = "inventory_stack.txt"; // Path for the stack file
 
-    // Change to a List to store richer items
-    private final List<ItemDto> inventoryItems = new CopyOnWriteArrayList<>(); // Thread-safe list
+    private final List<ItemDto> inventoryItems = new CopyOnWriteArrayList<>();
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final FileBackedStringStack simpleFileStack; // Instance of our dedicated stack class
 
     public InventoryStackService() {
-        
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-    
+        this.simpleFileStack = new FileBackedStringStack(STACK_DATA_FILE_PATH); // Initialize here
     }
 
     @PostConstruct
+    private void initializeData() {
+        loadItemsFromFile();
+        this.simpleFileStack.loadFromFile(); // loading to the stack class
+    }
+
+    @PreDestroy
+    private void saveDataOnShutdown() {
+        saveItemsToFile();
+        this.simpleFileStack.saveToFile(); // saving to the stack class
+    }
+
     private synchronized void loadItemsFromFile() {
-        File file = new File(DATA_FILE_PATH);
+        File file = new File(ITEMS_DATA_FILE_PATH);
         if (!file.exists() || file.length() == 0) {
-            logger.info("Inventory data file '{}' not found or empty. Starting with an empty inventory.", DATA_FILE_PATH);
+            logger.info("Inventory data file '{}' not found or empty. Starting with an empty inventory.", ITEMS_DATA_FILE_PATH);
+            if (inventoryItems.isEmpty() && file.length() == 0) {
+                try {
+                    ItemDto initialLaptop = new ItemDto("#05673", "Laptop", 3, new java.math.BigDecimal("128"), "Electronics", "null");
+                    inventoryItems.add(initialLaptop);
+                    logger.info("Initialized with a default Laptop item as inventory_data.json was empty.");
+                    saveItemsToFile();
+                } catch (Exception e) {
+                    logger.error("Error initializing default item: {}", e.getMessage(), e);
+                }
+            }
             return;
         }
         try {
             List<ItemDto> loadedItems = objectMapper.readValue(file, new TypeReference<List<ItemDto>>() {});
+            inventoryItems.clear();
             inventoryItems.addAll(loadedItems);
-            logger.info("Loaded {} items from '{}'", inventoryItems.size(), DATA_FILE_PATH);
+            logger.info("Loaded {} items from '{}'", inventoryItems.size(), ITEMS_DATA_FILE_PATH);
         } catch (IOException e) {
-            logger.error("Error loading inventory from file '{}': {}", DATA_FILE_PATH, e.getMessage(), e);
+            logger.error("Error loading inventory from file '{}': {}", ITEMS_DATA_FILE_PATH, e.getMessage(), e);
         }
     }
 
-    @PreDestroy
     private synchronized void saveItemsToFile() {
         try {
-            objectMapper.writeValue(new File(DATA_FILE_PATH), inventoryItems);
-            logger.info("Saved {} items to '{}'", inventoryItems.size(), DATA_FILE_PATH);
+            objectMapper.writeValue(new File(ITEMS_DATA_FILE_PATH), inventoryItems);
+            logger.info("Saved {} items to '{}'", inventoryItems.size(), ITEMS_DATA_FILE_PATH);
         } catch (IOException e) {
-            logger.error("Error saving inventory to file '{}': {}", DATA_FILE_PATH, e.getMessage(), e);
+            logger.error("Error saving inventory to file '{}': {}", ITEMS_DATA_FILE_PATH, e.getMessage(), e);
         }
     }
 
-    // --- CRUD Operations ---
-
     public List<ItemDto> getAllItems() {
-        return new ArrayList<>(inventoryItems); // Return a copy
+        return new ArrayList<>(inventoryItems);
     }
 
     public Optional<ItemDto> getItemByCode(String itemCode) {
@@ -89,13 +108,11 @@ public class InventoryStackService { // Consider renaming to InventoryItemServic
         Optional<ItemDto> existingItemOpt = getItemByCode(itemCode);
         if (existingItemOpt.isPresent()) {
             ItemDto existingItem = existingItemOpt.get();
-            // Update fields - be careful if itemCode can be updated
             existingItem.setName(updatedItemDetails.getName());
             existingItem.setQuantity(updatedItemDetails.getQuantity());
             existingItem.setUnitPrice(updatedItemDetails.getUnitPrice());
             existingItem.setCategory(updatedItemDetails.getCategory());
             existingItem.setDescription(updatedItemDetails.getDescription());
-
             logger.info("Updated item: {}", itemCode);
             saveItemsToFile();
             return Optional.of(existingItem);
@@ -115,25 +132,22 @@ public class InventoryStackService { // Consider renaming to InventoryItemServic
         return removed;
     }
 
-    // --- Keep simplified LIFO-like methods if still needed for a part of your app,
-    //     or remove them if the new UI makes them obsolete.
-    //     For now, I'm commenting them out to focus on the new structure.
 
-    /*
-    public synchronized void pushSimpleItem(String itemName) { // Example, if you still need a simple push
-        // This would need a way to create a full ItemDto or a different handling
-        ItemDto simplePushItem = new ItemDto("TEMP_CODE_" + System.currentTimeMillis(), itemName, 1, BigDecimal.ZERO, "Default", "Simple push");
-        inventoryItems.add(simplePushItem); // Adds to the end, like a queue. For stack, add to beginning or use Deque.
-        saveItemsToFile();
+    public void pushSimpleStackItem(String itemName) {
+        this.simpleFileStack.push(itemName);
+        this.simpleFileStack.saveToFile(); // Save after modification
     }
 
-    public synchronized Optional<ItemDto> popSimpleItem() { // Example
-        if (inventoryItems.isEmpty()) {
-            return Optional.empty();
+    public Optional<String> popSimpleStackItem() {
+        String poppedItem = this.simpleFileStack.pop();
+        if (poppedItem != null) {
+            this.simpleFileStack.saveToFile(); // Save after modification
+            return Optional.of(poppedItem);
         }
-        ItemDto popped = inventoryItems.remove(inventoryItems.size() - 1); // LIFO from end of list
-        saveItemsToFile();
-        return Optional.of(popped);
+        return Optional.empty();
     }
-    */
+
+    public List<String> getSimpleStackItems() {
+        return this.simpleFileStack.getItemsView();
+    }
 }
